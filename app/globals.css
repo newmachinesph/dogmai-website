@@ -1,0 +1,391 @@
+@import "tailwindcss";
+
+:root {
+  --background: #060503;
+  --foreground: #f4efe6;
+  --muted: #9a9a9a;
+  --muted-strong: #6f6f6f;
+  --accent-neutral: #e6e6e6;
+  --accent-dim: rgba(230, 230, 230, 0.25);
+  --grid-line: rgba(255, 255, 255, 0.2);
+  --grid-line-strong: rgba(255, 255, 255, 0.45);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-raveo);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #060503;
+    --foreground: #f4efe6;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-raveo), sans-serif;
+  overflow-x: hidden;
+}
+
+.bento-grid {
+  position: relative;
+}
+
+.bento-grid::before,
+.bento-grid::after {
+  content: '';
+  position: absolute;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.bento-corner {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-neutral);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  z-index: 22;
+  pointer-events: none;
+}
+
+.bento-corner-tl {
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.bento-corner-tr {
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.bento-corner-bl {
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, 50%);
+}
+
+.bento-corner-br {
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+}
+
+.bento-item:hover .bento-corner {
+  opacity: 1;
+}
+
+.dogm-theme {
+  --background: #060503;
+  --foreground: #f4efe6;
+  --muted: #c9b89b;
+  --muted-strong: #a8987a;
+  --accent-orange: #f97316;
+  --accent-green: #22c55e;
+  --accent-green-dim: rgba(34, 197, 94, 0.25);
+  --grid-line: rgba(255, 255, 255, 0.2);
+  --grid-line-strong: rgba(56, 56, 56, 0.9);
+}
+
+.dogm-theme .bento-corner {
+  background: var(--accent-orange);
+}
+
+.dogm-theme .bg-black {
+  background-color: var(--background) !important;
+}
+
+.dogm-theme .text-white {
+  color: var(--foreground) !important;
+}
+
+.dogm-theme .text-slate-300 {
+  color: #d8c9b0 !important;
+}
+
+.dogm-theme .text-slate-400 {
+  color: var(--muted) !important;
+}
+
+.dogm-theme .text-slate-500 {
+  color: var(--muted-strong) !important;
+}
+
+.dogm-theme .text-emerald-400 {
+  color: var(--accent-green) !important;
+}
+
+.dogm-theme .bg-white {
+  background-color: var(--accent-orange) !important;
+}
+
+.dogm-theme .text-black {
+  color: #0d0906 !important;
+}
+
+.dogm-theme .border-slate-800 {
+  border-color: #2e2e2e !important;
+}
+
+.dogm-theme .border-slate-900 {
+  border-color: #171717 !important;
+}
+
+.dogm-theme .border-slate-900\/80 {
+  border-color: #202020 !important;
+}
+
+.dogm-theme .hover\:bg-slate-200:hover {
+  background-color: #fb923c !important;
+}
+
+.dogm-theme .hover\:bg-slate-900:hover {
+  background-color: rgba(34, 197, 94, 0.08) !important;
+}
+
+.bg-black {
+  background-color: var(--background) !important;
+}
+
+.text-white {
+  color: var(--foreground) !important;
+}
+
+.text-slate-300 {
+  color: #d1d1d1 !important;
+}
+
+.text-slate-400 {
+  color: var(--muted) !important;
+}
+
+.text-slate-500 {
+  color: var(--muted-strong) !important;
+}
+
+.text-emerald-400 {
+  color: #e6e6e6 !important;
+}
+
+.bg-white {
+  background-color: #f5f5f5 !important;
+}
+
+.text-black {
+  color: #0b0b0b !important;
+}
+
+.border-slate-800 {
+  border-color: var(--accent-dim) !important;
+}
+
+.border-slate-900 {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+.border-slate-900\/80 {
+  border-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+.hover\:bg-slate-200:hover {
+  background-color: #e2e2e2 !important;
+}
+
+.hover\:bg-slate-900:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Hide top border on consecutive grids within space-y-0 wrapper to prevent overlap */
+.space-y-0 > section + section .bento-grid::before {
+  display: none;
+}
+
+/* Grid-level top border */
+.bento-grid::before {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--grid-line) 0px,
+    var(--grid-line) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  animation: bento-dash-x 2s linear infinite;
+}
+
+/* Grid-level left border */
+.bento-grid::after {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--grid-line) 0px,
+    var(--grid-line) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  animation: bento-dash-y 2s linear infinite;
+}
+
+@keyframes bento-dash-x {
+  to {
+    background-position-x: -16px;
+  }
+}
+
+@keyframes bento-dash-y {
+  to {
+    background-position-y: -16px;
+  }
+}
+
+/* Accessibility Improvements */
+
+/* Global focus styles for better keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
+
+/* Screen reader only utility (already used in skip link) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Better link focus states */
+a:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Improve contrast for better readability */
+.dogm-theme .text-slate-300 {
+  color: #ddd0bb !important; /* Improved from #d8c9b0 for better contrast */
+}
+
+.dogm-theme .text-slate-400 {
+  color: #d4c5a8 !important; /* Improved from #c9b89b for WCAG AA compliance */
+}
+
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced selection styling */
+::selection {
+  background-color: rgba(249, 115, 22, 0.3);
+  color: #fff;
+}
+
+.dogm-theme ::selection {
+  background-color: rgba(249, 115, 22, 0.4);
+  color: #f4efe6;
+}
+
+/* Subtle text glow utility for headings */
+.text-glow-orange {
+  text-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+}
+
+.text-glow-emerald {
+  text-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+}
+
+/* Smooth transitions for all interactive elements */
+.bento-item {
+  transition: background 0.5s ease;
+}
+
+/* Enhanced button hover states */
+.dogm-theme a[href="/enroll"]:hover {
+  filter: brightness(1.1);
+}
+
+/* Improved table styling */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.dogm-theme ::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.2);
+}
+
+.dogm-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.4);
+}
+
+/* Hide scrollbar utility for swipable elements */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

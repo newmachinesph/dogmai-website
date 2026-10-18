@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOGM.AI x CNY 2026 — Social Media Post Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0806;
+      color: #f4efe6;
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #f4efe6;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #c9b89b;
+      margin-bottom: 24px;
+    }
+
+    .workspace {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .canvas-wrapper {
+      border: 1px solid #2a2520;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+
+    canvas {
+      display: block;
+      max-width: 540px;
+      max-height: 540px;
+      width: 100%;
+      height: auto;
+    }
+
+    .controls {
+      background: #0d0a08;
+      border: 1px solid #2a2520;
+      border-radius: 8px;
+      padding: 24px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #c9b89b;
+      font-weight: 600;
+    }
+
+    input[type="text"], textarea, select {
+      background: #1a1815;
+      border: 1px solid #2a2520;
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #f4efe6;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, textarea:focus, select:focus {
+      border-color: #f97316;
+    }
+
+    textarea { resize: vertical; min-height: 60px; }
+
+    .upload-zone {
+      border: 2px dashed #2a2520;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-zone:hover {
+      border-color: #f97316;
+      background: rgba(249, 115, 22, 0.05);
+    }
+
+    .upload-zone.has-image {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.05);
+    }
+
+    .upload-zone p {
+      font-size: 13px;
+      color: #c9b89b;
+    }
+
+    .upload-zone .icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316, #D4213D);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(249, 115, 22, 0.4);
+    }
+
+    .btn-secondary {
+      background: #1a1815;
+      border: 1px solid #2a2520;
+      color: #f4efe6;
+    }
+
+    .btn-secondary:hover {
+      border-color: #f97316;
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-row input[type="color"] {
+      width: 36px;
+      height: 36px;
+      border: 1px solid #2a2520;
+      border-radius: 6px;
+      padding: 2px;
+      background: #1a1815;
+      cursor: pointer;
+    }
+
+    .color-row span {
+      font-size: 12px;
+      color: #c9b89b;
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .range-row input[type="range"] {
+      flex: 1;
+      accent-color: #f97316;
+    }
+
+    .range-row .val {
+      font-size: 12px;
+      color: #c9b89b;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f97316;
+      padding-top: 8px;
+      border-top: 1px solid #1a1815;
+    }
+
+    .layout-options {
+      display: flex;
+      gap: 8px;
+    }
+
+    .layout-btn {
+      flex: 1;
+      padding: 8px;
+      background: #1a1815;
+      border: 1px solid #2a2520;
+      border-radius: 6px;
+      color: #c9b89b;
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .layout-btn.active {
+      border-color: #f97316;
+      color: #f97316;
+      background: rgba(249, 115, 22, 0.1);
+    }
+
+    .layout-btn:hover {
+      border-color: #f97316;
+    }
+  </style>
+</head>
+<body>
+
+<h1>DOGM.AI x Chinese New Year 2026</h1>
+<p class="subtitle">Year of the Fire Horse — Instagram Post Generator (1080 x 1080)</p>
+
+<div class="workspace">
+  <div class="canvas-wrapper">
+    <canvas id="postCanvas" width="1080" height="1080"></canvas>
+  </div>
+
+  <div class="controls">
+    <div class="section-title">HORSE ILLUSTRATION</div>
+
+    <div class="control-group">
+      <label>Upload Horse Image (PNG with transparency)</label>
+      <div class="upload-zone" id="uploadZone">
+        <div class="icon">&#128014;</div>
+        <p id="uploadLabel">Click or drag to upload</p>
+        <input type="file" id="horseUpload" accept="image/*">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>Horse Size</label>
+      <div class="range-row">
+        <input type="range" id="horseSize" min="200" max="800" value="500">
+        <span class="val" id="horseSizeVal">500</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>Horse Y Position</label>
+      <div class="range-row">
+        <input type="range" id="horseY" min="-200" max="400" value="60">
+        <span class="val" id="horseYVal">60</span>
+      </div>
+    </div>
+
+    <div class="section-title">LAYOUT</div>
+
+    <div class="control-group">
+      <label>Design Style</label>
+      <div class="layout-options">
+        <button class="layout-btn active" data-layout="centered" onclick="setLayout('centered')">Centered</button>
+        <button class="layout-btn" data-layout="bottom" onclick="setLayout('bottom')">Bottom Text</button>
+        <button class="layout-btn" data-layout="split" onclick="setLayout('split')">Split</button>
+      </div>
+    </div>
+
+    <div class="section-title">TEXT</div>
+
+    <div class="control-group">
+      <label>Chinese Greeting</label>
+      <input type="text" id="chineseText" value="恭喜发财">
+    </div>
+
+    <div class="control-group">
+      <label>English Greeting</label>
+      <input type="text" id="englishText" value="Wishing You Prosperity">
+    </div>
+
+    <div class="control-group">
+      <label>Year Subtitle</label>
+      <input type="text" id="yearText" value="Year of the Fire Horse 2026">
+    </div>
+
+    <div class="section-title">COLORS</div>
+
+    <div class="control-group">
+      <div class="color-row">
+        <input type="color" id="bgColor" value="#060503">
+        <span>Background</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="color-row">
+        <input type="color" id="accentColor" value="#f97316">
+        <span>Orange Accent</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="color-row">
+        <input type="color" id="redColor" value="#D4213D">
+        <span>CNY Red</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="color-row">
+        <input type="color" id="goldColor" value="#FFD700">
+        <span>Gold</span>
+      </div>
+    </div>
+
+    <div class="section-title">EFFECTS</div>
+
+    <div class="control-group">
+      <label>Fire Glow Intensity</label>
+      <div class="range-row">
+        <input type="range" id="glowIntensity" min="0" max="100" value="60">
+        <span class="val" id="glowVal">60</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>Gold Ornament Opacity</label>
+      <div class="range-row">
+        <input type="range" id="ornamentOpacity" min="0" max="100" value="40">
+        <span class="val" id="ornamentVal">40</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveAsImage()">Save as PNG (1080 x 1080)</button>
+    <button class="btn btn-secondary" onclick="draw()">Refresh Preview</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('postCanvas');
+const ctx = canvas.getContext('2d');
+
+let horseImg = null;
+let currentLayout = 'centered';
+
+// DOGM.AI dot-matrix D logo pattern
+const dPattern = [
+  [1,1,1,1,1,0,0],
+  [1,1,1,1,1,1,0],
+  [1,1,0,0,1,1,1],
+  [1,1,0,0,0,1,1],
+  [1,1,0,0,0,1,1],
+  [1,1,0,0,0,1,1],
+  [1,1,0,0,1,1,1],
+  [1,1,1,1,1,1,0],
+  [1,1,1,1,1,0,0],
+];
+
+// --- UPLOAD ---
+const uploadInput = document.getElementById('horseUpload');
+const uploadZone = document.getElementById('uploadZone');
+const uploadLabel = document.getElementById('uploadLabel');
+
+uploadInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      horseImg = img;
+      uploadZone.classList.add('has-image');
+      uploadLabel.textContent = file.name;
+      draw();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// --- CONTROLS ---
+function val(id) { return document.getElementById(id).value; }
+function numVal(id) { return parseInt(document.getElementById(id).value); }
+
+// Live update listeners
+['chineseText','englishText','yearText','bgColor','accentColor','redColor','goldColor'].forEach(id => {
+  document.getElementById(id).addEventListener('input', draw);
+});
+['horseSize','horseY','glowIntensity','ornamentOpacity'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    document.getElementById(id + 'Val').textContent = el.value;
+    draw();
+  });
+});
+
+function setLayout(layout) {
+  currentLayout = layout;
+  document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-layout="${layout}"]`).classList.add('active');
+  draw();
+}
+
+// --- DRAW ---
+function draw() {
+  const W = 1080, H = 1080;
+  const bg = val('bgColor');
+  const accent = val('accentColor');
+  const red = val('redColor');
+  const gold = val('goldColor');
+  const glowInt = numVal('glowIntensity') / 100;
+  const ornamentAlpha = numVal('ornamentOpacity') / 100;
+  const chText = val('chineseText');
+  const enText = val('englishText');
+  const yrText = val('yearText');
+
+  ctx.clearRect(0, 0, W, H);
+
+  // --- Background ---
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle radial gradient glow (fire)
+  if (glowInt > 0) {
+    const grd = ctx.createRadialGradient(W/2, H * 0.32, 50, W/2, H * 0.32, 500);
+    grd.addColorStop(0, hexToRgba(accent, 0.25 * glowInt));
+    grd.addColorStop(0.4, hexToRgba(red, 0.12 * glowInt));
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    // secondary glow — top warm
+    const grd2 = ctx.createRadialGradient(W * 0.7, H * 0.1, 30, W * 0.7, H * 0.1, 350);
+    grd2.addColorStop(0, hexToRgba(gold, 0.1 * glowInt));
+    grd2.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd2;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // --- Gold ornamental corners ---
+  if (ornamentAlpha > 0) {
+    drawCornerOrnaments(ctx, W, H, gold, ornamentAlpha);
+  }
+
+  // --- Decorative border ---
+  ctx.strokeStyle = hexToRgba(gold, 0.15 * ornamentAlpha);
+  ctx.lineWidth = 2;
+  roundRect(ctx, 40, 40, W - 80, H - 80, 12);
+  ctx.stroke();
+
+  // Inner border
+  ctx.strokeStyle = hexToRgba(gold, 0.08 * ornamentAlpha);
+  ctx.lineWidth = 1;
+  roundRect(ctx, 52, 52, W - 104, H - 104, 8);
+  ctx.stroke();
+
+  // --- Layout-specific rendering ---
+  if (currentLayout === 'centered') {
+    drawCenteredLayout(ctx, W, H, { accent, red, gold, chText, enText, yrText, glowInt });
+  } else if (currentLayout === 'bottom') {
+    drawBottomLayout(ctx, W, H, { accent, red, gold, chText, enText, yrText, glowInt });
+  } else if (currentLayout === 'split') {
+    drawSplitLayout(ctx, W, H, { accent, red, gold, chText, enText, yrText, glowInt });
+  }
+
+  // --- DOGM.AI Logo (bottom) ---
+  drawDogmLogo(ctx, W, H, accent, gold);
+
+  // --- Floating particles (embers) ---
+  drawEmbers(ctx, W, H, accent, red, gold);
+}
+
+// =====================
+// LAYOUT: CENTERED
+// =====================
+function drawCenteredLayout(ctx, W, H, o) {
+  // Horse image
+  if (horseImg) {
+    const size = numVal('horseSize');
+    const yOff = numVal('horseY');
+    const aspect = horseImg.width / horseImg.height;
+    const drawW = size;
+    const drawH = size / aspect;
+    const x = (W - drawW) / 2;
+    const y = H * 0.10 + yOff;
+
+    // Glow behind horse
+    ctx.save();
+    ctx.shadowColor = o.accent;
+    ctx.shadowBlur = 60 * o.glowInt;
+    ctx.drawImage(horseImg, x, y, drawW, drawH);
+    ctx.restore();
+    ctx.drawImage(horseImg, x, y, drawW, drawH);
+  }
+
+  // Chinese text
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Large Chinese greeting
+  const chFontSize = 88;
+  ctx.font = `bold ${chFontSize}px "Noto Serif SC", "SimSun", "Songti SC", serif`;
+  ctx.fillStyle = o.gold;
+  ctx.shadowColor = hexToRgba(o.gold, 0.4);
+  ctx.shadowBlur = 20;
+  ctx.fillText(o.chText, W/2, H * 0.68);
+  ctx.shadowBlur = 0;
+
+  // Decorative line under Chinese text
+  const chWidth = ctx.measureText(o.chText).width;
+  drawDecorativeLine(ctx, W/2 - chWidth/2 - 30, H * 0.715 + 20, chWidth + 60, o.gold, 0.3);
+
+  // English greeting
+  ctx.font = `300 28px -apple-system, "Segoe UI", sans-serif`;
+  ctx.fillStyle = '#f4efe6';
+  ctx.letterSpacing = '4px';
+  ctx.fillText(o.enText.toUpperCase(), W/2, H * 0.76);
+
+  // Year subtitle
+  ctx.font = `600 16px -apple-system, "Segoe UI", sans-serif`;
+  ctx.fillStyle = hexToRgba(o.accent, 0.8);
+  ctx.fillText(o.yrText.toUpperCase(), W/2, H * 0.81);
+
+  ctx.restore();
+}
+
+// =====================
+// LAYOUT: BOTTOM TEXT
+// =====================
+function drawBottomLayout(ctx, W, H, o) {
+  // Horse image — larger, more central
+  if (horseImg) {
+    const size = numVal('horseSize') * 1.1;
+    const yOff = numVal('horseY') - 40;
+    const aspect = horseImg.width / horseImg.height;
+    const drawW = size;
+    const drawH = size / aspect;
+    const x = (W - drawW) / 2;
+    const y = H * 0.02 + yOff;
+
+    ctx.save();
+    ctx.shadowColor = o.accent;
+    ctx.shadowBlur = 60 * o.glowInt;
+    ctx.drawImage(horseImg, x, y, drawW, drawH);
+    ctx.restore();
+    ctx.drawImage(horseImg, x, y, drawW, drawH);
+  }
+
+  // Bottom gradient overlay
+  const overlay = ctx.createLinearGradient(0, H * 0.5, 0, H);
+  overlay.addColorStop(0, 'transparent');
+  overlay.addColorStop(0.3, hexToRgba(val('bgColor'), 0.85));
+  overlay.addColorStop(1, val('bgColor'));
+  ctx.fillStyle = overlay;
+  ctx.fillRect(0, H * 0.5, W, H * 0.5);
+
+  // Text at bottom
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.font = `bold 80px "Noto Serif SC", "SimSun", "Songti SC", serif`;
+  ctx.fillStyle = o.gold;
+  ctx.shadowColor = hexToRgba(o.gold, 0.4);
+  ctx.shadowBlur = 20;
+  ctx.fillText(o.chText, W/2, H * 0.68);
+  ctx.shadowBlur = 0;
+
+  ctx.font = `300 26px -apple-system, "Segoe UI", sans-serif`;
+  ctx.fillStyle = '#f4efe6';
+  ctx.fillText(o.enText.toUpperCase(), W/2, H * 0.75);
+
+  ctx.font = `600 15px -apple-system, "Segoe UI", sans-serif`;
+  ctx.fillStyle = hexToRgba(o.accent, 0.8);
+  ctx.fillText(o.yrText.toUpperCase(), W/2, H * 0.80);
+
+  ctx.restore();
+}
+
+// =====================
+// LAYOUT: SPLIT
+// =====================
+function drawSplitLayout(ctx, W, H, o) {
+  // Left side: text, Right side: horse
+  // Diagonal split line
+  ctx.save();
+
+  // Chinese text — left aligned
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+
+  // Vertical Chinese text
+  const chars = o.chText.split('');
+  const charSize = 72;
+  ctx.font = `bold ${charSize}px "Noto Serif SC", "SimSun", "Songti SC", serif`;
+  ctx.fillStyle = o.gold;
+  ctx.shadowColor = hexToRgba(o.gold, 0.3);
+  ctx.shadowBlur = 15;
+
+  chars.forEach((ch, i) => {
+    ctx.fillText(ch, 100, 160 + i * (charSize + 16));
+  });
+  ctx.shadowBlur = 0;
+
+  // English text
+  ctx.font = `300 24px -apple-system, "Segoe UI", sans-serif`;
+  ctx.fillStyle = '#f4efe6';
+  ctx.fillText(o.enText, 100, 160 + chars.length * (charSize + 16) + 40);
+
+  // Year
+  ctx.font = `600 14px -apple-system, "Segoe UI", sans-serif`;
+  ctx.fillStyle = hexToRgba(o.accent, 0.8);
+  ctx.fillText(o.yrText.toUpperCase(), 100, 160 + chars.length * (charSize + 16) + 80);
+
+  ctx.restore();
+
+  // Horse on right
+  if (horseImg) {
+    const size = numVal('horseSize') * 0.95;
+    const yOff = numVal('horseY');
+    const aspect = horseImg.width / horseImg.height;
+    const drawW = size;
+    const drawH = size / aspect;
+    const x = W - drawW - 40;
+    const y = H * 0.1 + yOff;
+
+    ctx.save();
+    ctx.shadowColor = o.accent;
+    ctx.shadowBlur = 50 * o.glowInt;
+    ctx.drawImage(horseImg, x, y, drawW, drawH);
+    ctx.restore();
+    ctx.drawImage(horseImg, x, y, drawW, drawH);
+  }
+}
+
+// =====================
+// DOGM.AI LOGO
+// =====================
+function drawDogmLogo(ctx, W, H, accent, gold) {
+  ctx.save();
+
+  const dotR = 3.2;
+  const spacing = 9;
+  const logoW = 7 * spacing;
+  const logoH = 9 * spacing;
+  const startX = W / 2 - (logoW / 2 + 80);
+  const startY = H - 150;
+
+  // Dot-matrix D
+  dPattern.forEach((row, rowIdx) => {
+    row.forEach((cell, colIdx) => {
+      if (cell === 1) {
+        const x = startX + colIdx * spacing + spacing / 2;
+        const y = startY + rowIdx * spacing + spacing / 2;
+        const isOuterCurve = colIdx >= 4 || (rowIdx <= 1 && colIdx >= 3) || (rowIdx >= 7 && colIdx >= 3);
+
+        ctx.beginPath();
+        ctx.arc(x, y, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = isOuterCurve ? accent : '#ffffff';
+        ctx.fill();
+      }
+    });
+  });
+
+  // DOGM.AI text
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.font = `700 26px -apple-system, "Segoe UI", sans-serif`;
+
+  const textX = startX + logoW + 14;
+  const textY = startY + logoH / 2 - 8;
+
+  // DOGM
+  ctx.fillStyle = '#f4efe6';
+  ctx.fillText('DOGM', textX, textY);
+  const dogmW = ctx.measureText('DOGM').width;
+
+  // . (orange dot)
+  ctx.fillStyle = accent;
+  ctx.fillText('.', textX + dogmW, textY);
+  const dotW = ctx.measureText('.').width;
+
+  // AI
+  ctx.fillStyle = '#f4efe6';
+  ctx.fillText('AI', textX + dogmW + dotW, textY);
+
+  // Tagline
+  ctx.font = `400 10px -apple-system, "Segoe UI", sans-serif`;
+  ctx.fillStyle = hexToRgba('#c9b89b', 0.7);
+  ctx.fillText('DEVELOPERS OF GREAT MINDS', textX, textY + 20);
+
+  ctx.restore();
+}
+
+// =====================
+// CORNER ORNAMENTS
+// =====================
+function drawCornerOrnaments(ctx, W, H, gold, alpha) {
+  ctx.save();
+  ctx.strokeStyle = hexToRgba(gold, 0.25 * alpha);
+  ctx.lineWidth = 2;
+  const s = 60; // ornament size
+  const m = 30; // margin
+
+  // Top-left
+  ctx.beginPath();
+  ctx.moveTo(m, m + s); ctx.lineTo(m, m); ctx.lineTo(m + s, m);
+  ctx.stroke();
+  // small inner
+  ctx.beginPath();
+  ctx.moveTo(m + 8, m + s - 15); ctx.lineTo(m + 8, m + 8); ctx.lineTo(m + s - 15, m + 8);
+  ctx.stroke();
+
+  // Top-right
+  ctx.beginPath();
+  ctx.moveTo(W - m - s, m); ctx.lineTo(W - m, m); ctx.lineTo(W - m, m + s);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(W - m - s + 15, m + 8); ctx.lineTo(W - m - 8, m + 8); ctx.lineTo(W - m - 8, m + s - 15);
+  ctx.stroke();
+
+  // Bottom-left
+  ctx.beginPath();
+  ctx.moveTo(m, H - m - s); ctx.lineTo(m, H - m); ctx.lineTo(m + s, H - m);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(m + 8, H - m - s + 15); ctx.lineTo(m + 8, H - m - 8); ctx.lineTo(m + s - 15, H - m - 8);
+  ctx.stroke();
+
+  // Bottom-right
+  ctx.beginPath();
+  ctx.moveTo(W - m, H - m - s); ctx.lineTo(W - m, H - m); ctx.lineTo(W - m - s, H - m);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(W - m - 8, H - m - s + 15); ctx.lineTo(W - m - 8, H - m - 8); ctx.lineTo(W - m - s + 15, H - m - 8);
+  ctx.stroke();
+
+  // Diamond motifs at corners
+  const dSize = 6;
+  [
+    [m + s/2, m - 2],
+    [W - m - s/2, m - 2],
+    [m - 2, H/2],
+    [W - m + 2, H/2],
+    [m + s/2, H - m + 2],
+    [W - m - s/2, H - m + 2],
+  ].forEach(([x, y]) => {
+    ctx.fillStyle = hexToRgba(gold, 0.3 * alpha);
+    ctx.beginPath();
+    ctx.moveTo(x, y - dSize);
+    ctx.lineTo(x + dSize, y);
+    ctx.lineTo(x, y + dSize);
+    ctx.lineTo(x - dSize, y);
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  ctx.restore();
+}
+
+// =====================
+// DECORATIVE LINE
+// =====================
+function drawDecorativeLine(ctx, x, y, width, color, alpha) {
+  ctx.save();
+  const lineY = y;
+
+  // Center line
+  ctx.strokeStyle = hexToRgba(color, alpha);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 20, lineY);
+  ctx.lineTo(x + width - 20, lineY);
+  ctx.stroke();
+
+  // End diamonds
+  const d = 4;
+  [x + 10, x + width - 10].forEach(dx => {
+    ctx.fillStyle = hexToRgba(color, alpha * 1.5);
+    ctx.beginPath();
+    ctx.moveTo(dx, lineY - d);
+    ctx.lineTo(dx + d, lineY);
+    ctx.lineTo(dx, lineY + d);
+    ctx.lineTo(dx - d, lineY);
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  ctx.restore();
+}
+
+// =====================
+// EMBERS / PARTICLES
+// =====================
+function drawEmbers(ctx, W, H, accent, red, gold) {
+  ctx.save();
+  // Seed-based deterministic particles so they don't flicker on redraw
+  const particles = [
+    { x: 0.12, y: 0.18, r: 2.5, c: accent, a: 0.5 },
+    { x: 0.85, y: 0.25, r: 2, c: gold, a: 0.4 },
+    { x: 0.75, y: 0.12, r: 1.8, c: red, a: 0.35 },
+    { x: 0.22, y: 0.72, r: 2.2, c: accent, a: 0.3 },
+    { x: 0.9, y: 0.65, r: 1.5, c: gold, a: 0.45 },
+    { x: 0.08, y: 0.45, r: 1.8, c: red, a: 0.25 },
+    { x: 0.65, y: 0.08, r: 2, c: gold, a: 0.35 },
+    { x: 0.35, y: 0.15, r: 1.5, c: accent, a: 0.3 },
+    { x: 0.92, y: 0.42, r: 2.5, c: red, a: 0.2 },
+    { x: 0.18, y: 0.88, r: 1.8, c: gold, a: 0.3 },
+    { x: 0.55, y: 0.05, r: 2, c: accent, a: 0.35 },
+    { x: 0.78, y: 0.82, r: 1.5, c: gold, a: 0.25 },
+    { x: 0.42, y: 0.92, r: 2, c: red, a: 0.2 },
+    { x: 0.05, y: 0.62, r: 1.8, c: accent, a: 0.3 },
+    { x: 0.68, y: 0.55, r: 1.2, c: gold, a: 0.2 },
+  ];
+
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x * W, p.y * H, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(p.c, p.a);
+    ctx.shadowColor = p.c;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+  });
+
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+// =====================
+// UTILITIES
+// =====================
+function hexToRgba(hex, alpha) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+// =====================
+// SAVE
+// =====================
+function saveAsImage() {
+  const link = document.createElement('a');
+  link.download = 'DOGMAI-CNY-2026-Fire-Horse.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// Auto-load horse.png from public folder
+(function loadDefaultHorse() {
+  const img = new Image();
+  img.onload = () => {
+    horseImg = img;
+    uploadZone.classList.add('has-image');
+    uploadLabel.textContent = 'horse.png (auto-loaded)';
+    draw();
+  };
+  img.onerror = () => {
+    // horse.png not found, draw without it
+    draw();
+  };
+  img.src = 'horse.png';
+})();
+</script>
+</body>
+</html>
